@@ -112,14 +112,11 @@ public class DbManager {
             rs = pstmt.executeQuery();//创建数据对象
             while (rs.next()){
                 UserInfoBean userInfoBean=new UserInfoBean();
-                userInfoBean.setName(rs.getString(1));
-                userInfoBean.setPwd(rs.getInt(2));
-                userInfoBean.setUnitName(rs.getString(3));
-                userInfoBean.setUnitId(rs.getString(4));
+                userInfoBean.setName(rs.getString(2));
+                userInfoBean.setPwd(rs.getInt(3));
+                userInfoBean.setUnitName(rs.getString(4));
+                userInfoBean.setUnitId(rs.getString(5));
                 userInfoBeans.add(userInfoBean);
-                System.out.print(rs.getString(2) + "\t");
-                System.out.print(rs.getInt(3) + "\t");
-                System.out.println();
             }
             rs.close();
         } catch (SQLException e) {
@@ -127,6 +124,9 @@ public class DbManager {
         }
         return userInfoBeans;
     }
+
+
+
     public void close(){
         try {
             conn.close();

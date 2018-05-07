@@ -13,11 +13,11 @@ public class NetworkUtils {
 
 	private static OkHttpClient okHttpClient=new OkHttpClient.Builder().build();
 	
-	public static void doGet(String url, final ResultInfoInterface resultInfoInterface){
+	public static void doGet(String url, String tenantId,final ResultInfoInterface resultInfoInterface){
 		Request request = new Request.Builder()
 				.url(url)
 				.addHeader("Authorization","Basic YWRtaW46cGFzc3dvcmQ=")
-				.addHeader("X-SiteWhere-Tenant","sitewhere1234567890")
+				.addHeader("X-SiteWhere-Tenant",tenantId) //"sitewhere1234567890"
 				.build();
 		Call call=okHttpClient.newCall(request);
 		call.enqueue(new Callback() {
@@ -32,8 +32,8 @@ public class NetworkUtils {
 				List<UserBean> userList=JSON.parseArray(result, UserBean.class);
 				userList.get(0).getName();
 				userList.size();//大小*/
-				System.out.println(arg1.body().string());
-				resultInfoInterface.onResponse(arg1.body().string());
+//				System.out.println(arg1.body().string());
+				resultInfoInterface.onResponse(result);
 				
 			}
 			
@@ -46,7 +46,7 @@ public class NetworkUtils {
 	}
 
 
-	public static void doPost(String url, String json, final ResultInfoInterface resultInfoInterface){
+	public static void doPost(String url, String json,String tenantId, final ResultInfoInterface resultInfoInterface){
 		//上传json
         //1 设置类型
 		MediaType mediaType=MediaType.parse("application/json");
@@ -56,7 +56,7 @@ public class NetworkUtils {
 		Request request=new Request.Builder()
 				.url(url)
 				.addHeader("Authorization","Basic YWRtaW46cGFzc3dvcmQ=")
-				.addHeader("X-SiteWhere-Tenant","sitewhere1234567890")
+				.addHeader("X-SiteWhere-Tenant",tenantId)
 				.post(requestBody)
 				.build();
         //4 创建call对象
@@ -70,7 +70,7 @@ public class NetworkUtils {
 
 			@Override
 			public void onResponse(Call call, Response response) throws IOException {
-				System.out.println(response.body().string());
+//				System.out.println(response.body().string());
 				resultInfoInterface.onResponse(response.body().string());
 			}
 		});
