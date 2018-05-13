@@ -12,7 +12,7 @@ public class DbManager {
 
     private Connection conn = null;
     //siteware 是数据库名，根据需要修改
-    private String url = "jdbc:mysql://localhost:3306/siteware";
+    private String url = "jdbc:mysql://localhost:3306/siteware?useUnicode=true&characterEncoding=utf-8";
     public static DbManager getInstance(){
         if(dbManager==null){
             synchronized (DbManager.class){
@@ -40,7 +40,7 @@ public class DbManager {
     public void createTable(){
         PreparedStatement pstmt;
 
-        String sql = "create table stu(id integer primary key not null auto_increment,name varchar(20),pwd integer,unitName varchar(20),unitId varchar(20))";
+        String sql = "create table IF NOT EXISTS stu(id integer primary key not null auto_increment,name varchar(20),pwd integer,unitName varchar(20),unitId varchar(20)) ENGINE=InnoDB DEFAULT CHARSET=utf8";
         try {
             pstmt=conn.prepareStatement(sql);
             pstmt.execute();
