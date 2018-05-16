@@ -1,6 +1,7 @@
 package model.AddPerson;
 
 public class AddPersonBean {
+    public AddPersonBean(){}
     private String emailAddress;
 
     private String id;
@@ -14,6 +15,8 @@ public class AddPersonBean {
     private String userName;
 
     private String sitewhereToken;
+
+    private String deviceHardwareId;
 
     public void setEmailAddress(String emailAddress){
         this.emailAddress = emailAddress;
@@ -56,5 +59,11 @@ public class AddPersonBean {
     }
     public String getSitewhereToken(){
         return this.sitewhereToken;
+    }
+    public void setDeviceHardwareId(String deviceHardwareId){
+        this.deviceHardwareId = deviceHardwareId;
+    }
+    public String getDeviceHardwareId(){
+        return this.deviceHardwareId;
     }
 }

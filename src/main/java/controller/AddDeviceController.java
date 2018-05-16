@@ -7,7 +7,13 @@ import interfaces.ResultInfoInterface;
 import model.*;
 import model.AddPerson.AddPersonBean;
 import model.AddSite.AddSiteBean;
+import model.AssociaPerson.AssociaPersonBean;
+import model.AssociaPerson.Metadata;
 import model.CreateDevice.CreateDeviceBean;
+import model.DeviceList.Data;
+import model.DeviceList.DeviceList;
+import model.ResDeviceList.ResDeviceListBean;
+import model.ResDeviceList.ResultBean;
 import model.SpecToken.SpecTokenBean;
 import model.SpecToken.SpecTokensBean;
 import network.NetworkUtils;
@@ -40,6 +46,14 @@ public class AddDeviceController {
     private int page;
     private int pageSize;
     private String result1 = null;
+    DeviceList deviceList = new DeviceList();
+
+    DeviceList siteDevices = new DeviceList();
+
+    private String resultTemp = null;
+    private String allDeviceList = null;
+    private String siteDeviceList = null;
+
     //获取site列表
     @RequestMapping(value = "/getSite", method = RequestMethod.GET)
     public String register2(@RequestParam(value="page",required=true)int page,@RequestParam(value="pageSize",required=true)int pageSize,@RequestParam(value="sitewhereToken",required = true) String sitewhereToken){
@@ -86,17 +100,36 @@ public class AddDeviceController {
         });
         return createDevice;
     }
-    //添加assetperson 安全管理员
+    //添加assetperson 安全管理员并建立连接
+
     @RequestMapping(value = "/addSafePerson",method = RequestMethod.POST)
-    public String addSafePerson(@RequestBody AddPersonBean addPersonBean){
+    public String addSafePerson(@RequestBody final AddPersonBean addPersonBean){
         String addPerson=JSON.toJSONString(addPersonBean);
+        String resultFinal = null;
         NetworkUtils.doPost("http://localhost:8080/sitewhere/api/assets/categories/default-person-asset/persons", addPerson, addPersonBean.getSitewhereToken(), new ResultInfoInterface() {
             @Override
             public void onResponse(String result) {
-                System.out.println(result);
+                AssociaPersonBean associaPersonBean = new AssociaPersonBean();
+                associaPersonBean.setAssetId(addPersonBean.getId());
+                associaPersonBean.setAssetModuleId("default-person-asset");
+                associaPersonBean.setAssignmentType("Associated");
+                associaPersonBean.setDeviceHardwareId(addPersonBean.getDeviceHardwareId());
+                associaPersonBean.setMetadata(new Metadata());
+                String associaPerson=JSON.toJSONString(associaPersonBean);
+                NetworkUtils.doPost("http://localhost:8080/sitewhere/api/assignments", associaPerson, addPersonBean.getSitewhereToken(), new ResultInfoInterface() {
+                    @Override
+                    public void onResponse(String result) {
+//                        System.out.println(result);
+                        result1 = result;
+
+                    }
+                });
             }
         });
-        return addPerson;
+        while(result1 == null){
+            continue;
+        }
+        return result1;
     }
     //查询用户的spectoken
     @RequestMapping(value = "/getSpecToken", method = RequestMethod.GET)
@@ -121,5 +154,141 @@ public class AddDeviceController {
         return JSON.toJSONString(specTokensBean);
     }
 
+    //获取devicelist
+    @RequestMapping(value = "/getDeviceList", method = RequestMethod.GET)
+    public String getDeviceList(@RequestParam(value="page",required=true)int page,@RequestParam(value="pageSize",required=true)int pageSize,@RequestParam(value="siteToken",required = true) String siteToken,@RequestParam(value="sitewhereToken",required = true) String sitewhereToken){
+        this.page =page;
+        this.pageSize=pageSize;
+        String url1 = "http://localhost:8080/sitewhere/api/sites/" +siteToken+
+                "/assignments?includeDevice=true&includeAsset=true&page=";
+        String url2 ="&pageSize=";
+        String url = url1+this.page+url2+this.pageSize;
+        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
+            @Override
+            public void onResponse(String result) {
+                List<Data> dataList = new ArrayList<Data>();
+                ResDeviceListBean resDeviceListBean=JSON.toJavaObject(JSON.parseObject(result), ResDeviceListBean.class);
+                for(int i=0;i<resDeviceListBean.getResults().size();i++){
+                    Data data = new Data();
+                    ResultBean res = resDeviceListBean.getResults().get(i);
+                    data.setAssetName(res.getAssetName());
+                    data.setComments(res.getDevice().getComments());
+                    data.setHardwareId(res.getDeviceHardwareId());
+                    data.setName(res.getAssociatedPerson().getName());
+                    data.setId(res.getAssociatedPerson().getId());
+                    data.setEmailAddress(res.getAssociatedPerson().getEmailAddress());
+                    data.setLocationCity(res.getDevice().getMetadata().getLocationCity());
+                    data.setLocationDetial(res.getDevice().getMetadata().getLocationDetial());
+                    data.setCenterLatitude(res.getDevice().getMetadata().getCenterLatitude());
+                    data.setCenterLongitude(res.getDevice().getMetadata().getCenterLongitude());
+                    data.setAssignToken(res.getToken());
+                    dataList.add(data);
+                }
+                deviceList.setData(dataList);
+
+
+            }
+        });
+        while(JSON.toJSONString(deviceList) == null){
+            continue;
+        }
+        return JSON.toJSONString(deviceList);
+    }
+
+    //获取devicelist  筛选by sitetoken
+    @RequestMapping(value = "/getSiteDevices", method = RequestMethod.GET)
+    public String getSiteDevices(@RequestParam(value="siteToken",required = true) String siteToken,@RequestParam(value="sitewhereToken",required = true) String sitewhereToken){
+
+        String url = "http://localhost:8080/sitewhere/api/sites/" +siteToken+
+                "/assignments?includeDevice=true&includeAsset=true";
+        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
+            @Override
+            public void onResponse(String result) {
+                List<Data> dataList = new ArrayList<Data>();
+                ResDeviceListBean resDeviceListBean=JSON.toJavaObject(JSON.parseObject(result), ResDeviceListBean.class);
+                for(int i=0;i<resDeviceListBean.getResults().size();i++){
+                    Data data = new Data();
+                    ResultBean res = resDeviceListBean.getResults().get(i);
+                    data.setAssetName(res.getAssetName());
+                    data.setComments(res.getDevice().getComments());
+                    data.setHardwareId(res.getDeviceHardwareId());
+                    data.setName(res.getAssociatedPerson().getName());
+                    data.setId(res.getAssociatedPerson().getId());
+                    data.setEmailAddress(res.getAssociatedPerson().getEmailAddress());
+                    data.setLocationCity(res.getDevice().getMetadata().getLocationCity());
+                    data.setLocationDetial(res.getDevice().getMetadata().getLocationDetial());
+                    data.setCenterLatitude(res.getDevice().getMetadata().getCenterLatitude());
+                    data.setCenterLongitude(res.getDevice().getMetadata().getCenterLongitude());
+//
+                    dataList.add(data);
+                }
+                siteDevices.setData(dataList);
+            }
+        });
+        return JSON.toJSONString(siteDevices);
+    }
+
+
+
+    @RequestMapping(value = "/getAllDeviceList", method = RequestMethod.GET)
+    public String getAllDeviceList(@RequestParam(value="page",required=true)int page,@RequestParam(value="pageSize",required=true)int pageSize,@RequestParam(value="siteToken",required = true) String siteToken,@RequestParam(value="sitewhereToken",required = true) String sitewhereToken){
+        this.page =page;
+        this.pageSize=pageSize;
+        String url1 = "http://localhost:8080/sitewhere/api/devices?includeDeleted=false&excludeAssigned=false&includeSpecification=true&includeAssignment=true&page=";
+        String url2 ="&pageSize=";
+        String url = url1+this.page+url2+this.pageSize;
+        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
+            @Override
+            public void onResponse(String result) {
+                allDeviceList=result;
+            }
+        });
+        while(allDeviceList == null){
+            continue;
+        }
+        return allDeviceList;
+    }
+
+    //获取site的device
+    @RequestMapping(value = "/getSiteDeviceList", method = RequestMethod.GET)
+    public String getSiteDeviceList(@RequestParam(value="page",required=true)int page,@RequestParam(value="pageSize",required=true)int pageSize,@RequestParam(value="siteToken",required = true) String siteToken,@RequestParam(value="sitewhereToken",required = true) String sitewhereToken){
+        this.page =page;
+        this.pageSize=pageSize;
+        String url1 = "http://localhost:8080/sitewhere/api/devices?includeDeleted=false&excludeAssigned=false&includeSpecification=true&includeAssignment=true&site="+siteToken+"&page=";
+        String url2 ="&pageSize=";
+        String url = url1+this.page+url2+this.pageSize;
+        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
+            @Override
+            public void onResponse(String result) {
+                System.out.println(result);
+                siteDeviceList=result;
+            }
+        });
+        while(siteDeviceList == null){
+            continue;
+        }
+        return siteDeviceList;
+    }
+
+
+
+    @RequestMapping(value = "/getTempVal", method = RequestMethod.GET)
+    public String getTempVal(@RequestParam(value="assignToken",required = true) String assignToken,@RequestParam(value="sitewhereToken",required = true) String sitewhereToken){
+        String url = "http://localhost:8080/sitewhere/api/assignments/" +assignToken+
+                "/measurements/series";
+        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
+            @Override
+            public void onResponse(String result) {
+                resultTemp = result;
+                System.out.println(result);
+
+            }
+        });
+
+        while(resultTemp == null){
+            continue;
+        }
+        return resultTemp;
+    }
 
 }
