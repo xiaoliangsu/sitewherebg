@@ -47,9 +47,9 @@ public class AddDeviceController {
     private int pageSize;
     private String result1 = null;
     DeviceList deviceList = new DeviceList();
-
+    DeviceList deviceListResult= null;
     DeviceList siteDevices = new DeviceList();
-
+    DeviceList siteDevicesResult = null;
     private String resultTemp = null;
     private String allDeviceList = null;
     private String siteDeviceList = null;
@@ -59,6 +59,7 @@ public class AddDeviceController {
     public String register2(@RequestParam(value="page",required=true)int page,@RequestParam(value="pageSize",required=true)int pageSize,@RequestParam(value="sitewhereToken",required = true) String sitewhereToken){
         this.page =page;
         this.pageSize=pageSize;
+        result1 = null;
         String url1 = "http://localhost:8080/sitewhere/api/sites?includeAssignments=false&includeZones=false&page=";
         String url2 ="&pageSize=";
         String url = url1+this.page+url2+this.pageSize;
@@ -159,6 +160,7 @@ public class AddDeviceController {
     public String getDeviceList(@RequestParam(value="page",required=true)int page,@RequestParam(value="pageSize",required=true)int pageSize,@RequestParam(value="siteToken",required = true) String siteToken,@RequestParam(value="sitewhereToken",required = true) String sitewhereToken){
         this.page =page;
         this.pageSize=pageSize;
+        deviceListResult = null;
         String url1 = "http://localhost:8080/sitewhere/api/sites/" +siteToken+
                 "/assignments?includeDevice=true&includeAsset=true&page=";
         String url2 ="&pageSize=";
@@ -185,14 +187,15 @@ public class AddDeviceController {
                     dataList.add(data);
                 }
                 deviceList.setData(dataList);
+                deviceListResult = deviceList;
 
 
             }
         });
-        while(JSON.toJSONString(deviceList) == null){
+        while(deviceListResult  == null){
             continue;
         }
-        return JSON.toJSONString(deviceList);
+        return JSON.toJSONString(deviceListResult);
     }
 
     //获取devicelist  筛选by sitetoken
@@ -223,9 +226,13 @@ public class AddDeviceController {
                     dataList.add(data);
                 }
                 siteDevices.setData(dataList);
+                siteDevicesResult=siteDevices;
             }
         });
-        return JSON.toJSONString(siteDevices);
+        while(siteDevicesResult == null){
+            continue;
+        }
+        return JSON.toJSONString(siteDevicesResult);
     }
 
 
