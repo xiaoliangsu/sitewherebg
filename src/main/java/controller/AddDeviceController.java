@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+
 import sun.nio.ch.Net;
 
 import javax.jws.soap.SOAPBinding;
@@ -201,12 +202,13 @@ public class AddDeviceController {
     //获取devicelist  筛选by sitetoken
     @RequestMapping(value = "/getSiteDevices", method = RequestMethod.GET)
     public String getSiteDevices(@RequestParam(value="siteToken",required = true) String siteToken,@RequestParam(value="sitewhereToken",required = true) String sitewhereToken){
-
+        siteDevicesResult = null;
         String url = "http://localhost:8080/sitewhere/api/sites/" +siteToken+
                 "/assignments?includeDevice=true&includeAsset=true";
         NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
             @Override
             public void onResponse(String result) {
+
                 List<Data> dataList = new ArrayList<Data>();
                 ResDeviceListBean resDeviceListBean=JSON.toJavaObject(JSON.parseObject(result), ResDeviceListBean.class);
                 for(int i=0;i<resDeviceListBean.getResults().size();i++){
@@ -260,6 +262,7 @@ public class AddDeviceController {
     @RequestMapping(value = "/getSiteDeviceList", method = RequestMethod.GET)
     public String getSiteDeviceList(@RequestParam(value="page",required=true)int page,@RequestParam(value="pageSize",required=true)int pageSize,@RequestParam(value="siteToken",required = true) String siteToken,@RequestParam(value="sitewhereToken",required = true) String sitewhereToken){
         this.page =page;
+        siteDeviceList = null;
         this.pageSize=pageSize;
         String url1 = "http://localhost:8080/sitewhere/api/devices?includeDeleted=false&excludeAssigned=false&includeSpecification=true&includeAssignment=true&site="+siteToken+"&page=";
         String url2 ="&pageSize=";

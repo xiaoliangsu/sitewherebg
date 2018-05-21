@@ -34,6 +34,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import sun.nio.ch.Net;
 
 import javax.jws.soap.SOAPBinding;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 @ComponentScan
@@ -89,5 +93,44 @@ public class MeasureController {
         }
         return StartMeasuresResult;
     }
+
+    private String getDatafromFile(String fileName) {
+
+        String Path="/Users/zhangyunlong/Downloads/china-main-city/" + fileName+ ".json";
+        BufferedReader reader = null;
+        String laststr = "";
+        try {
+            FileInputStream fileInputStream = new FileInputStream(Path);
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+            reader = new BufferedReader(inputStreamReader);
+            String tempString = null;
+            while ((tempString = reader.readLine()) != null) {
+                laststr += tempString;
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return laststr;
+    }
+
+    @RequestMapping(value = "/getCityJson", method = RequestMethod.GET)
+    public String getCityJson(@RequestParam(value="cityName",required = false) String cityName,@RequestParam(value="sitewhereToken",required = false) String sitewhereToken){
+
+        String resultCity = null;
+
+        resultCity=getDatafromFile(cityName);
+        return resultCity;
+    }
+
+
 
 }
