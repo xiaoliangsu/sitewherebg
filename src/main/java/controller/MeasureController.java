@@ -1,6 +1,7 @@
 package controller;
 import com.alibaba.fastjson.JSON;
 import com.sun.org.apache.regexp.internal.RE;
+import config.GlobalCorsConfig;
 import db.DbDeviceManage;
 import db.DbManager;
 import interfaces.ResultInfoInterface;
@@ -22,6 +23,7 @@ import org.apache.catalina.User;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,6 +47,7 @@ import java.util.List;
 @EnableAutoConfiguration
 @RestController
 @RequestMapping("/measure")
+@Import(GlobalCorsConfig.class)
 public class MeasureController {
 
     private String result1 = null;
