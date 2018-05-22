@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Page Index</title>
+</head>
+<body>
+<h2>前台系统</h2>
+<p id="info"></p>
+</body>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script>
+    $.ajax({
+        url: 'http://localhost:8005/user/index',
+        type: "GET",
+        success: function (data) {
+            $("#info").html("跨域访问成功:"+data);
+        },
+        error: function (data) {
+            $("#info").html("跨域失败!!");
+        }
+    })
+</script>
+</html>
