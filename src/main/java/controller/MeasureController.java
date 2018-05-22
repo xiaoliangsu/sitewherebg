@@ -50,6 +50,7 @@ public class MeasureController {
     private String result1 = null;
 
     private String StartMeasuresResult = null;
+    private String StartAlertResult = null;
 
     //获取measures
     @RequestMapping(value = "/getMeasures", method = RequestMethod.GET)
@@ -130,6 +131,29 @@ public class MeasureController {
         resultCity=getDatafromFile(cityName);
         return resultCity;
     }
+
+    @RequestMapping(value = "/getStartAlert", method = RequestMethod.GET)
+    public String getStartAlert(@RequestParam(value="startDate",required = true) String startDate,@RequestParam(value="siteToken",required = true) String siteToken,@RequestParam(value="sitewhereToken",required = true) String sitewhereToken){
+
+        String url = "http://localhost:8080/sitewhere/api/sites/"+siteToken+"/alerts?startDate="+startDate;
+        NetworkUtils.doGet(url, sitewhereToken, new ResultInfoInterface() {
+            @Override
+            public void onResponse(String result) {
+                System.out.println(result);
+                StartAlertResult = result;
+//                List<MeasureBean> measureBean=JSON.toJavaObject(JSON.parseObject(result), MeasureBean.class);
+
+
+            }
+        });
+        while(StartAlertResult == null){
+            continue;
+        }
+        return StartAlertResult;
+    }
+
+
+
 
 
 

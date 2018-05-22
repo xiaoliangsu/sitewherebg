@@ -224,7 +224,7 @@ public class AddDeviceController {
                     data.setLocationDetial(res.getDevice().getMetadata().getLocationDetial());
                     data.setCenterLatitude(res.getDevice().getMetadata().getCenterLatitude());
                     data.setCenterLongitude(res.getDevice().getMetadata().getCenterLongitude());
-//
+                    data.setAssignToken(res.getToken());
                     dataList.add(data);
                 }
                 siteDevices.setData(dataList);

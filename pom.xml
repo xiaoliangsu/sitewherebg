@@ -25,6 +25,12 @@
     <!-- Add typical dependencies for a web application -->
     <dependencies>
         <dependency>
+            <groupId>com.sitewhere</groupId>
+            <artifactId>sitewhere-client</artifactId>
+            <version>1.5.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
