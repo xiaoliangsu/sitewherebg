@@ -70,7 +70,7 @@ public class NetworkUtils {
 
 			@Override
 			public void onResponse(Call call, Response response) throws IOException {
-//				System.out.println(response.body().string());
+				System.out.println(response.body().string());
 				resultInfoInterface.onResponse(response.body().string());
 			}
 		});
