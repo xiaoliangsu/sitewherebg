@@ -74,8 +74,9 @@ public class NetworkUtils {
 				resultInfoInterface.onResponse(response.body().string());
 			}
 		});
+
+
 	}
-	public static String doPostAsync(){
-		return "";
-	}
+
+
 }
