@@ -75,4 +75,7 @@ public class NetworkUtils {
 			}
 		});
 	}
+	public static String doPostAsync(){
+		return "";
+	}
 }
